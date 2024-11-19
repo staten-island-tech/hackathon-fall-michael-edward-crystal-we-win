@@ -12,6 +12,24 @@ pygame.display.set_caption('Give Us 100. Please.')
 
 
 class TitleScreen():
+    def DrawButton(screen, text, rect, font, base_color, hover_color, action=None):
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_click = pygame.mouse.get_pressed()
+    
+        if rect.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, hover_color, rect)
+            if mouse_click[0] and action:  # Left mouse click
+                action()
+        else:
+            pygame.draw.rect(screen, base_color, rect)
+    
+        text_surf = font.render(text, True, (150, 180, 200))
+        text_rect = text_surf.get_rect(center=rect.center)
+        screen.blit(text_surf, text_rect)
+
+    def ButtonAction():
+        print('b')
+    
     def OpenScreen():
         RUNNINGtitlescreen = True
         while RUNNINGtitlescreen:
@@ -23,6 +41,7 @@ class TitleScreen():
             lilfont = pygame.font.Font(None, 30)
     
             rect = pygame.Rect(400, 100, 400, 100)
+            startbutton = pygame.draw.rect(screen, (105, 120, 155), (400, 100, 100, 100))
             textbox = pygame.draw.rect(screen, (30, 45, 78), rect) 
             titletext = font.render(TEXTtitle, True, (135, 225, 240))
             bytext = lilfont.render("By Michael (mostly), Edward, and Crystal", True, (255, 255, 255))
@@ -31,9 +50,11 @@ class TitleScreen():
             circleoutline = pygame.draw.circle(screen, (0, 200, 255), (600, 800), 350, 10) 
             circleoutline2 = pygame.draw.circle(screen, (0, 200, 255), (600, 800), 150, 10) 
     
-            text_rect = titletext.get_rect(center=rect.center)
-            bytextmap = bytext.get_rect(center=(rect.centerx, rect.bottom + 50))
-     
+            text_rect = titletext.get_rect(center=(rect.centerx, rect.bottom + 50))
+            bytextmap = bytext.get_rect(center=(rect.centerx, rect.bottom + 150))
+            TitleScreen.DrawButton(screen, "Start Game", rect, font, (60, 90, 100), (80, 120, 130), TitleScreen.ButtonAction())
+
+            
             screen.blit(titletext, text_rect) 
             screen.blit(bytext, bytextmap)
     
