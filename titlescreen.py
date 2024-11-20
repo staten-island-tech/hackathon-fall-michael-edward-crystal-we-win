@@ -8,13 +8,18 @@ screen.fill(COLORbackground)
 
 TEXTtitle = "RHYTHM game"
 pygame.display.set_caption('Give Us 100. Please.')
-
-
-
+class Game():
+    def StartGame():
+        pass
+    
+    
+    
+    
 class TitleScreen():
     def DrawButton(screen, text, rect, font, base_color, hover_color, action=None):
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.mouse.get_pressed()
+        mouse_release = pygame.MOUSEBUTTONUP
     
         if rect.collidepoint(mouse_pos):
             pygame.draw.rect(screen, hover_color, rect)
@@ -27,8 +32,8 @@ class TitleScreen():
         text_rect = text_surf.get_rect(center=rect.center)
         screen.blit(text_surf, text_rect)
 
-    def ButtonAction():
-        print('b')
+    def ButtonAction(rect):
+        pygame.draw.rect(screen, (10, 15, 26), rect)
     
     def OpenScreen():
         RUNNINGtitlescreen = True
@@ -52,7 +57,7 @@ class TitleScreen():
     
             text_rect = titletext.get_rect(center=(rect.centerx, rect.bottom + 50))
             bytextmap = bytext.get_rect(center=(rect.centerx, rect.bottom + 150))
-            TitleScreen.DrawButton(screen, "Start Game", rect, font, (60, 90, 100), (80, 120, 130), TitleScreen.ButtonAction())
+            button = TitleScreen.DrawButton(screen, "Start Game", rect, font, (60, 90, 100), (80, 120, 130), TitleScreen.ButtonAction(rect))
 
             
             screen.blit(titletext, text_rect) 
