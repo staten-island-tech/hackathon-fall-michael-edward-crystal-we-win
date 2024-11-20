@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class MAP:
-    def __init__(self, mp3path: str,songStruct: dict = None) -> None:
+    def __init__(self, mp3path: str,* , songStruct: dict = None, customKeys: list[str] = None) -> None:
         self.mp3path = mp3path
         self.songStruct = songStruct or None
-        self.KEYS = ["W","A","S","D"]
+        self.KEYS = customKeys or ["W","A","S","D"]
 
     def fourier_transform(self) -> list: #what type is a db scaled spectogram ???????>
         y, sr = librosa.load(self.mp3path, sr=None) 
@@ -34,12 +34,12 @@ class MAP:
             gmap.append(
                 {
                   "Key": random.choice(self.KEYS),
-                  'Time': time  
+                  'Time': time
                 }
             )
 
     
 Megalovania = MAP(r"C:\Users\mike.mat\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3")
-print(Megalovania.get_tempo()[0])
+print(Megalovania.map())
 
     
