@@ -11,9 +11,6 @@ window.title("RHYTHM GAME")
 window.geometry('800x500')
 songs = []
 
-with open('songs.json', 'r') as file:
-    songs = json.load(file)
-
 titlefont = font.Font(family='Times New Roman', size=100, weight='bold')
 buttonfont = font.Font(family="Verdana", size=35, weight='bold')
 
@@ -24,7 +21,7 @@ class TitleScreen():
             
         songbuttons = []
         for song in songs:
-            songbutton = tk.Button(window, text=song['name'], font=buttonfont, command=lambda: Game.StartGame())
+            songbutton = tk.Button(window, text=song['name'], font=buttonfont, command=lambda: Game.StartGame(song.name))
             songbutton.pack()
             songbuttons.append(songbutton)
     
