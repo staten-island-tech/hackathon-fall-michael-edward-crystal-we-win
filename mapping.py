@@ -1,9 +1,13 @@
 import librosa #https://librosa.org/doc/latest/index.html
 import numpy as np
 import matplotlib.pyplot as plt
+import random
+import bisect
+import asyncio
 
 class MAP:
-    def __init__(self, mp3path: str,* , songStruct: dict = None, customKeys: list[str] = None) -> None:
+    def __init__(self,name, mp3path: str,* , songStruct: dict = None, customKeys: list[str] = None) -> None:
+        self.name = name
         self.mp3path = mp3path
         self.songStruct = songStruct or None
         self.KEYS = customKeys or ["W","A","S","D"]
@@ -21,7 +25,7 @@ class MAP:
         plt.title('Spectrogram of the MP3 File')
         plt.show()
     
-    def get_tempo_beats(self) -> [int,int]:
+    def get_tempo_beats(self) -> list[int]:
         y, sr = librosa.load(self.mp3path, sr=None) 
         tempo, beatTimes = librosa.beat.beat_track(y=y, sr=sr)
         return tempo, librosa.frames_to_time(beatTimes, sr=sr) 
@@ -30,16 +34,65 @@ class MAP:
         gmap = []
         
         tempo,clicktimes = self.get_tempo_beats()
+        tempo = int(tempo[0])
+
         for i, time in enumerate(clicktimes):
-            gmap.append(
-                {
-                  "Key": random.choice(self.KEYS),
-                  'Time': time
-                }
-            )
+            gmap.append((round(float(time),3),random.choice(self.KEYS)))
+
+        difficulty = 'filler'
+        note_density =  (int(clicktimes[-1]) if clicktimes.size > 0 else 0)/500
+        key_diversity =  max(0, len(set(self.KEYS)) / 4 - 0.5) 
+
+        if key_diversity > 0.5:
+            key_diversity = float(round(1 - np.exp(-0.916 * (len(self.KEYS) - 4)), 2))
+
+        difficultyValue =  float(0.6 * (tempo / 180) +   0.3 * note_density +  0.1 * key_diversity)  
+        difficulties = [('Cakewalk',0),('Easy',0.3),("Medium",0.45),("Hard",0.65),("Hell",0.85),(":(",0.925),("Arbitary Max",1.01)]
+        
+        for i in difficulties:
+            if difficultyValue > i[1]: difficulty = i[0]
+            else: pass
+            
+        return [
+            {
+              "Name": self.name,
+              "Tempo": tempo,
+              "Difficulty": {difficulty: difficultyValue}
+            },
+            gmap
+        ]
+    
+async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> float | None: #runtime 5ms i think thats ok
+    PERFECT = 0.075
+    GOOD = 0.15
+    OK = 0.35
+    BAD = 0.5
+
+    beat_times = [beat_time for beat_time, beat_key in map if beat_key == key]
+
+    if not beat_times:
+        return None
+
+    # Binary search for the closest time (i didnt do this, chatgpt did.)
+    idx = bisect.bisect_left(beat_times, time)
+
+    closest_diff = float('inf')
+    if idx < len(beat_times):
+        closest_diff = abs(time - beat_times[idx])
+    if idx > 0:
+        closest_diff = min(closest_diff, abs(time - beat_times[idx - 1]))
+
+    if closest_diff <= PERFECT:
+        return 1.0
+    elif closest_diff <= GOOD:
+        return 0.8
+    elif closest_diff <= OK:
+        return 0.5
+    elif closest_diff <= BAD:
+        return 0.2
+    else:
+        return 0.0
 
     
-Megalovania = MAP(r"C:\Users\mike.mat\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3")
-print(Megalovania.map())
 
     
