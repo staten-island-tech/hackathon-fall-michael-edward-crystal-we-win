@@ -18,19 +18,15 @@ class TitleScreen():
         mouse_pos = pygame.mouse.get_pos()
         mouse_click = pygame.MOUSEBUTTONDOWN
         mouse_release = pygame.MOUSEBUTTONUP
-        buttonpressed = False
         
         if rect.collidepoint(mouse_pos):
             pygame.draw.rect(screen, hover_color, rect)
             for event in pygame.event.get():
                 if event.type == mouse_click and action:  # Left mouse click
-                    buttonpressed = True
+                    TitleScreen.ButtonAction(rect)
         else:
             pygame.draw.rect(screen, base_color, rect)
-            
-        if buttonpressed == True:
-            TitleScreen.ButtonAction(rect)
-            buttonpressed = False
+
     
         text_surf = font.render(text, True, (150, 180, 200))
         text_rect = text_surf.get_rect(center=rect.center)
@@ -77,15 +73,52 @@ class TitleScreen():
                 break
     
             pygame.display.update()
-            
+    
     def SelectMenuScreen():
         global RUNNINGmenuscreen, gamebuttonclicked
         RUNNINGmenuscreen = True
         gamebuttonclicked = False
         screen.fill(COLORbackground)
+        songs = [{
+                'name' : 'hi'
+            }, {
+                'name' : 'hey'
+            }] 
+        
         while RUNNINGmenuscreen == True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     RUNNINGtitlescreen = False
+                    RUNNINGmenuscreen = False
+                    break
+            
+            ycoordinate = 10
+            rect = pygame.Rect(400, 10, 400, 100)
+            buttonfont = pygame.font.Font(None, 30)
+        
+            # replace this with loading the json
+            
+            TitleScreen.LoadSongButtons()
+    
+    def LoadSongButtons():
+        rect = pygame.Rect(400, 100, 400, 100)
+        songs = [{
+                'name' : 'hi'
+            }, {
+                'name' : 'hey'
+            }] 
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_click = pygame.MOUSEBUTTONDOWN
+        mouse_release = pygame.MOUSEBUTTONUP
+        for song in songs:
+            if rect.collidepoint(mouse_pos):
+                pygame.draw.rect(screen, (80, 120, 130))
+            else:
+                pygame.draw.rect(screen, (60, 100, 110))
+            
+    def SongStart(song):
+        screen.fill(COLORbackground)
+        pygame.display.update()
+        print(song['name'])    
         
 TitleScreen.OpenScreen()
