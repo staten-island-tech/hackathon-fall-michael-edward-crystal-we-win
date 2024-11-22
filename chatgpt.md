@@ -3,7 +3,7 @@
 
 ## Project Name: _Rhythm Game_
 
-### Date: _[Insert date]_
+### Date: _11/22/24_
 
 ---
 
@@ -11,6 +11,7 @@
 
 Briefly describe the problem you're trying to solve or the task you're working on.
 
+`I'm trying to make a sign up and log in system using json files and pygame `
 
 ---
 
@@ -18,10 +19,12 @@ Briefly describe the problem you're trying to solve or the task you're working o
 
 Describe the initial approach you took to solving the problem. If you started writing code, include it here.
 
-```python
-# Example: Initial sorting function
-def sort_numbers(numbers):
-    return sorted(numbers)
+```
+1. Have 'log in' and 'sign up' as big text near the top.
+2. Make button - Get the rectangles that surrounds the texts in step 1 and make it so if there's a click on the rectangle, it does something. (pygame buttons are weird)
+3. If logging in, look through the json file to see if the username and password is there.
+4. If signing up, write the data to a json file.
+
 ```
 
 - What was your plan for solving the problem?
