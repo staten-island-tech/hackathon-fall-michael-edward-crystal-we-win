@@ -56,3 +56,49 @@ Optimize my function (function pasted) to have minimal time complexity
 
 To improve the time complexity and ensure the function runs quickly, we can: 1. Pre-filter the map for beats with matching keys. 2. Use a binary search or direct iteration to find the closest beat. ### Optimized Implementation ```python import pygame from bisect import bisect_left async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> float: """ 1: perfect, 0.99-0.6: good, 0.59-0.4: ok, 0.39-0.1: bad, 0: miss Parameters: time (float): The actual time of the player's input. key (str): The key pressed by the player. map (list): A sorted list of tuples (time, key). Returns: float: A value representing the player's timing and key accuracy. """ # Define timing windows in seconds PERFECT = 0.075 GOOD = 0.15 OK = 0.35 BAD = 0.5 # Filter the map for matching keys and extract times filtered_map = [beat_time for beat_time, beat_key in map if beat_key == key] if not filtered_map: return 0.0 # No matching keys found # Use binary search to find the closest time pos = bisect_left(filtered_map, time) # Determine the closest beat if pos == 0: closest_diff = abs(filtered_map[0] - time) elif pos == len(filtered_map): closest_diff = abs(filtered_map[-1] - time) else: left_diff = abs(filtered_map[pos - 1] - time) right_diff = abs(filtered_map[pos] - time) closest_diff = min(left_diff, right_diff) # Determine timing accuracy if closest_diff <= PERFECT: return 1.0 # Perfect elif closest_diff <= GOOD: return 0.8 # Good elif closest_diff <= OK: return 0.5 # OK elif closest_diff <= BAD: return 0.2 # Bad else: return 0.0 # Miss ``` ### Key Improvements 1. **Pre-filtering**: - Extract only the beats with a matching key, reducing the data size to process. - Time complexity: \( O(n) \), where \( n \) is the size of the map. 2. **Binary Search**: - Use `bisect_left` to quickly find the closest time in the filtered map. - Time complexity: \( O(\log k) \), where \( k \) is the size of the filtered map. 3. **Minimal Comparisons**: - After finding the closest position with `bisect_left`, only compare the surrounding two beats, reducing unnecessary checks. ### Assumptions - The input map is sorted by time. If not, you should sort it first, which has \( O(n \log n) \) complexity (done once at initialization). ### Example Usage ```python import asyncio # Example map (sorted list of tuples: (time, key)) example_map = [ (0.5, "W"), (1.0, "A"), (1.5, "S"), (2.0, "D"), (2.5, "W"), (3.0, "A"), ] # Simulate a player's input player_input_time = 1.45 player_input_key = "S" # Check input accuracy accuracy = asyncio.run(check_input(player_input_time, player_input_key, example_map)) print(f"Input accuracy: {accuracy}") ``` ### Time Complexity - **Pre-filtering**: \( O(n) \) (linear pass through the map). - **Binary search**: \( O(\log k) \), where \( k \) is the number of matching keys. - **Overall**: \( O(n) \), since filtering dominates for large inputs.
 
+    print(vid_gif(r'https://www.youtube.com/watch?v=wDgQdr8ZkTw'))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mike.mat\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\loadmap.py", line 11, in vid_gif
+    stream = yt.streams.filter(file_extension='mp4').first()
+             ^^^^^^^^^^
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\__main__.py", line 296, in streams
+    return StreamQuery(self.fmt_streams)
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\__main__.py", line 176, in fmt_streams
+    stream_manifest = extract.apply_descrambler(self.streaming_data)
+                                                ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\__main__.py", line 160, in streaming_data
+    self.bypass_age_gate()
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\__main__.py", line 257, in bypass_age_gate
+    innertube_response = innertube.player(self.video_id)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\innertube.py", line 448, in player
+    return self._call_api(endpoint, query, self.base_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\innertube.py", line 390, in _call_api
+    response = request._execute_request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\mike.mat\AppData\Roaming\Python\Python311\site-packages\pytube\request.py", line 37, in _execute_request
+    return urlopen(request, timeout=timeout)  # nosec
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\urllib\request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\urllib\request.py", line 525, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\urllib\request.py", line 634, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\urllib\request.py", line 563, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\urllib\request.py", line 496, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Program Files\Python311\Lib\urllib\request.py", line 643, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 403: Forbidden
+
+debug (function)
+function but debugged
