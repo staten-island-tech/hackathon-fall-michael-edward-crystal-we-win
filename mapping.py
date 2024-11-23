@@ -10,7 +10,7 @@ class MAP:
         self.name = name
         self.mp3path = mp3path
         self.songStruct = songStruct or None
-        self.KEYS = customKeys or ["W","A","S","D"]
+        self.KEYS = customKeys or ["Q"]
 
     def fourier_transform(self) -> list: #what type is a db scaled spectogram ???????>
         y, sr = librosa.load(self.mp3path, sr=None) 
@@ -30,14 +30,14 @@ class MAP:
         tempo, beatTimes = librosa.beat.beat_track(y=y, sr=sr)
         return tempo, librosa.frames_to_time(beatTimes, sr=sr) 
 
-    def map(self):
+    def map(self) -> list[dict]:
         gmap = []
         
         tempo,clicktimes = self.get_tempo_beats()
         tempo = int(tempo[0])
 
         for i, time in enumerate(clicktimes):
-            gmap.append((round(float(time),3),random.choice(self.KEYS)))
+            gmap.append((round(float(time),3) - 1280/750 ,random.choice(self.KEYS)))
 
         difficulty = 'filler'
         note_density =  (int(clicktimes[-1]) if clicktimes.size > 0 else 0)/500
@@ -63,10 +63,10 @@ class MAP:
         ]
     
 async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> float | None: #runtime 5ms i think thats ok
-    PERFECT = 0.075
-    GOOD = 0.15
-    OK = 0.35
-    BAD = 0.5
+    PERFECT = 0.05
+    GOOD = 0.1
+    OK = 0.15
+    BAD = 0.2
 
     beat_times = [beat_time for beat_time, beat_key in map if beat_key == key]
 
@@ -83,15 +83,15 @@ async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> fl
         closest_diff = min(closest_diff, abs(time - beat_times[idx - 1]))
 
     if closest_diff <= PERFECT:
-        return 1.0
+        return 1.0, beat_times[idx]
     elif closest_diff <= GOOD:
-        return 0.8
+        return 0.8, beat_times[idx]
     elif closest_diff <= OK:
-        return 0.5
+        return 0.5, beat_times[idx]
     elif closest_diff <= BAD:
-        return 0.2
+        return 0.2, beat_times[idx]
     else:
-        return 0.0
+        return -1, beat_times[idx]
 
     
 

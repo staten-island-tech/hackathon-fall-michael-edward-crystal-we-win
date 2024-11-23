@@ -5,96 +5,112 @@ import time
 import asyncio
 import math
 
-from moviepy.editor import VideoFileClip
 
+qwerty = 'qwertyuiopasdfghjklzxcvbnm'.upper()
 
+key_positions = {}
+for i in range(len(qwerty)):
+      key_positions[qwerty[i]] = 700*i/len(qwerty)  
+
+print(key_positions)
 def play_music(mp3path: str) -> None:
     pygame.mixer.music.load(mp3path)
     pygame.mixer.music.play(loops=0, start=0.0)
-
 
 def load_map(map: mapping.MAP) -> None:
     pygame.init()
     screen = pygame.display.set_mode((1280, 720))
     clock = pygame.time.Clock()
 
-    # Get map information and the beatmap
     map_info, beatMap = map.map()
     play_music(map.mp3path)
-
+   
+    toUpdateAsHit = []
     start_time = time.time()
     player_score = 0.0
     current_beat_index = 0
     in_map = True
     key_pressed = None
     streak = 0
+    streak_multiplier = 50 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 1) #50floor(log2(streak + 2))
 
-    # Create a list of notes to track their position over time
     notes = []
-
+    font = pygame.font.SysFont("Arial", 24)  
+    
     while in_map:
         timePlaying = time.time() - start_time
 
-        # Spawn new notes based on the beat map
         while current_beat_index < len(beatMap) and beatMap[current_beat_index][0] <= timePlaying:
             beat_time, beat_key = beatMap[current_beat_index]
-            
-            # Track each note's start time and key
+
+            y_pos = key_positions.get(beat_key.upper(), 100) 
+
             notes.append({
                 'beat_time': beat_time,
                 'beat_key': beat_key,
-                'spawned_at': timePlaying,  # Time when this note was spawned
-                'y_pos': 100 + (ord(beat_key) - ord("A")) * 50,  # Vertical position based on key
+                'spawned_at': timePlaying, 
+                'y_pos': y_pos,
+                'color': [random.randint(135, 255), random.randint(50, 200), random.randint(135, 255)],
+                'hit': False
             })
-            
+
             current_beat_index += 1
 
-        # Clear screen and redraw notes
         screen.fill((0, 0, 0))
 
-        # Update and draw each note
+      
         for note in notes:
-            # Calculate how much time has passed since the note spawned
+        
             time_since_spawned = timePlaying - note['spawned_at']
+            if note['beat_time'] in toUpdateAsHit:
+                note['hit'] = True
 
-            # Move the note horizontally across the screen (left to right)
-            x_pos = time_since_spawned * 100  # Adjust the multiplier for note speed
- 
-            # Draw the note as a red rectangle 
-            print(f"Spawned note at ({x_pos}, {note['y_pos']})")
-            pygame.draw.rect(screen, (255, 0, 0), (x_pos, note['y_pos'], 30, 30))
+            if not note['hit'] and timePlaying > note['beat_time'] + 0.2:
+                streak = 0 
+                player_score = max(player_score * 0.9, player_score - 50)
+                note['hit'] = True
 
-        # Handle user input
+            x_pos = time_since_spawned * 750  
+            
+            pygame.draw.rect(
+                screen,
+                tuple([min(255, i * random.uniform(0.95, 1.05)) for i in note['color']]),
+                (x_pos, note['y_pos'], 40, 15)
+            )
+
+            key_label = font.render(note['beat_key'], True, (255, 255, 255))
+            screen.blit(key_label, (1250, note['y_pos']))
+
+    
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 in_map = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    key_pressed = "W"
-                elif event.key == pygame.K_a:
-                    key_pressed = "A"
-                elif event.key == pygame.K_s:
-                    key_pressed = "S"
-                elif event.key == pygame.K_d:
-                    key_pressed = "D"
+                if pygame.K_a <= event.key <= pygame.K_z:  
+                    key_pressed = chr(event.key).upper()
 
-        # Check if the player pressed a key
+     
         if key_pressed:
-            score = asyncio.run(mapping.check_input(timePlaying, key_pressed, beatMap))
-            if score:
-                streak_multiplier = math.floor(math.log(streak + 1, 2)) if streak > 0 else 1
-                player_score += score * min(streak_multiplier, 8)  # Limit max multiplier
+            score, keyTime = asyncio.run(mapping.check_input(timePlaying, key_pressed, beatMap))
+            if score and score != -1:
+                streak_multiplier = 2 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 0.5)
+                toUpdateAsHit.append(keyTime)
+                player_score += 50 * score * min(streak_multiplier, 8)  
                 streak += 1
-            key_pressed = None  # Reset key press after checking
+            elif score == -1:
+                streak = 0
+                streak_multiplier = 1
+                player_score = 0.8*player_score
 
-        # Display score
-        font = pygame.font.SysFont("Arial", 36)
+            key_pressed = None  
+
         score_text = font.render(f"Score: {player_score:.2f}", True, (255, 255, 255))
+        streak_text = font.render(f"Streak: {streak} (Multiplier: {min(streak_multiplier,8)})",True, (255,255,255))
         screen.blit(score_text, (10, 10))
-
+        screen.blit(streak_text, (10,30))
+        
         pygame.display.flip()
-        clock.tick(60)  # Limit FPS to 60
+        clock.tick(60)  
 
 
-# Start the game with a map
-load_map(mapping.MAP('Megalovania', r"C:\Users\mike.mat\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3"))
+load_map(mapping.MAP('Megalovania', r"C:\Users\mmati\OneDrive\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3"))
