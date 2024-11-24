@@ -24,7 +24,7 @@ def load_map(map: mapping.MAP) -> None:
 
     map_info, beatMap = map.map()
     play_music(map.mp3path)
-   
+    hit_text = "Waiting..."
     toUpdateAsHit = []
     start_time = time.time()
     player_score = 0.0
@@ -33,8 +33,12 @@ def load_map(map: mapping.MAP) -> None:
     key_pressed = None
     streak = 0
     streak_multiplier = 50 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 1) #50floor(log2(streak + 2))
+    accuracy = 1
+    netscore = 0
+    notespassed = 0
 
     notes = []
+    scores = {"1.0": 'PERFECT', "0.8": 'GOOD', "0.5": "OK", "0.2": 'BAD', "-1": "MISS"} 
     font = pygame.font.SysFont("Arial", 24)  
     
     while in_map:
@@ -62,6 +66,8 @@ def load_map(map: mapping.MAP) -> None:
         for note in notes:
         
             time_since_spawned = timePlaying - note['spawned_at']
+            if note['beat_time'] + 1/(clock.get_fps() if clock.get_fps() != 0 else 1) >= timePlaying >= note['beat_time']: notespassed += 1 #im not sure what happened here
+
             if note['beat_time'] in toUpdateAsHit:
                 note['hit'] = True
 
@@ -92,23 +98,29 @@ def load_map(map: mapping.MAP) -> None:
      
         if key_pressed:
             score, keyTime = asyncio.run(mapping.check_input(timePlaying, key_pressed, beatMap))
-            if score and score != -1:
-                streak_multiplier = 2 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 0.5)
+            netscore += score ** (1/3) if score != -1 else 0
+            if score and score != -1 and note not in toUpdateAsHit:
+                streak_multiplier = 2 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 0.5) 
                 toUpdateAsHit.append(keyTime)
-                player_score += 50 * score * min(streak_multiplier, 8)  
+                player_score += 50 * score * min(streak_multiplier, 8) 
+                player_score *= accuracy/100 
                 streak += 1
-            elif score == -1:
+            elif score == -1 and note not in toUpdateAsHit:
                 streak = 0
                 streak_multiplier = 1
                 player_score = 0.8*player_score
+                toUpdateAsHit.append(keyTime)
 
             key_pressed = None  
-
+            hit_text = scores[str(score)]
+        
+        accuracy = round(100*netscore/notespassed,2) if notespassed != 0 else 0
         score_text = font.render(f"Score: {player_score:.2f}", True, (255, 255, 255))
         streak_text = font.render(f"Streak: {streak} (Multiplier: {min(streak_multiplier,8)})",True, (255,255,255))
+        #hit_text = font.render(hit_text, True, (random.randint(100,255),random.randint(100,255),random.randint(100,255)))
         screen.blit(score_text, (10, 10))
         screen.blit(streak_text, (10,30))
-        
+        screen.blit(font.render(f"{hit_text} ({accuracy}%)", True, (random.randint(100,255),random.randint(100,255),random.randint(100,255))), (10,50))
         pygame.display.flip()
         clock.tick(60)  
 
