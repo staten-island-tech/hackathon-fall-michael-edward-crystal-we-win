@@ -1,3 +1,9 @@
+# this code
+# 1) sucks,
+# 2) does not work,
+# so, sorry.
+
+
 import pygame
 pygame.init()
 

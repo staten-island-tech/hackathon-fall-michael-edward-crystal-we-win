@@ -16,7 +16,6 @@ while running:
     screen.fill(backgroundcolor)
     pygame.draw.rect(screen, (255, 0, 0), (200, 200, 1000, 100)) # color,  (x, y, width, height)
 
-
     pygame.draw.circle(screen, (0, 255, 0), (300, 300), 50) # color, coordinates, size
 
 
