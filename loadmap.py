@@ -125,4 +125,4 @@ def load_map(map: mapping.MAP) -> None:
         clock.tick(60)  
 
 
-load_map(mapping.MAP('Megalovania', r"C:\Users\mmati\OneDrive\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3"))
+#load_map(mapping.MAP('Megalovania', r"C:\Users\mmati\OneDrive\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3"))
