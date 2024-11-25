@@ -4,7 +4,7 @@ import random
 import time
 import asyncio
 import math
-
+asyncio.sleep(2)
 
 qwerty = 'qwertyuiopasdfghjklzxcvbnm'.upper()
 
@@ -19,7 +19,7 @@ def play_music(mp3path: str) -> None:
 
 def load_map(map: mapping.MAP) -> None:
     pygame.init()
-    screen = pygame.display.set_mode((1280, 720))
+    screen = pygame.display.set_mode((1310, 720))
     clock = pygame.time.Clock()
 
     map_info, beatMap = map.map()
@@ -74,6 +74,7 @@ def load_map(map: mapping.MAP) -> None:
             if not note['hit'] and timePlaying > note['beat_time'] + 0.2:
                 streak = 0 
                 player_score = max(player_score * 0.9, player_score - 50)
+                hit_text = 'MISS'
                 note['hit'] = True
 
             x_pos = time_since_spawned * 750  
@@ -85,7 +86,7 @@ def load_map(map: mapping.MAP) -> None:
             )
 
             key_label = font.render(note['beat_key'], True, (255, 255, 255))
-            screen.blit(key_label, (1250, note['y_pos']))
+            screen.blit(key_label, (1280, note['y_pos']))
 
     
         for event in pygame.event.get():
@@ -125,4 +126,4 @@ def load_map(map: mapping.MAP) -> None:
         clock.tick(60)  
 
 
-#load_map(mapping.MAP('Megalovania', r"C:\Users\mmati\OneDrive\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3"))
+load_map(mapping.MAP('The only thing I know for real', r"C:\Users\mike.mat\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\The only thing I know for real.mp3"))

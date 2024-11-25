@@ -10,7 +10,7 @@ class MAP:
         self.name = name
         self.mp3path = mp3path
         self.songStruct = songStruct or None
-        self.KEYS = customKeys or ["Q"]
+        self.KEYS = customKeys or ["W","A","S","D"]
 
     def fourier_transform(self) -> list: #what type is a db scaled spectogram ???????>
         y, sr = librosa.load(self.mp3path, sr=None) 
@@ -71,7 +71,7 @@ async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> fl
     beat_times = [beat_time for beat_time, beat_key in map if beat_key == key]
 
     if not beat_times:
-        return None
+        return -1, None
 
     # Binary search for the closest time (i didnt do this, chatgpt did.)
     idx = bisect.bisect_left(beat_times, time)
