@@ -1,4 +1,5 @@
 import pygame
+import json
 
 pygame.init()
 
@@ -58,6 +59,20 @@ class TitleScreen():
             TitleScreen.CreateStartGameButton()
             
             pygame.display.update()
+            
+    def Enter(songinput):
+        try:
+            with open('songs.json', 'r') as jsonfile:
+                songs = json.load(jsonfile)
+        except json.JSONDecodeError:
+            songs = []
+        found = False  
+        for song in songs:
+            if song.name == songinput:
+                found = True
+        
+        return found 
+            # MAKE THIS SEARCH YOUTUBE AND HAVE THE FUNCTION
     
     def PickaDamnSong():
         newrunning = True
@@ -79,11 +94,7 @@ class TitleScreen():
                 whatwetyping += " "
                 return whatwetyping
             if keys[pygame.K_BACKSPACE]:
-                whatwetypinglist = list(whatwetyping)
-                whatwetypinglist.remove(whatwetypinglist[len(whatwetypinglist) - 1])
-                whatwetyping = ""
-                for character in whatwetypinglist:
-                    whatwetyping += character
+                whatwetyping = whatwetyping[:-1]
                 return whatwetyping
              
             
@@ -101,9 +112,13 @@ class TitleScreen():
                     if textboxrect.collidepoint(pygame.mouse.get_pos()):
                         theyaretyping = True
                         color = (80, 120, 130)
+                        whatwetyping = ""
+                    elif confirmrect.collidepoint(pygame.mouse.get_pos()):
+                        TitleScreen.Enter(whatwetyping)
                     else:
                         color = (50, 90, 100)
                         theyaretyping = False
+                        
                     
             screen.fill((0, 0, 0))
             
@@ -121,14 +136,12 @@ class TitleScreen():
                 x += 1 
                 if x > 3:
                     x = 0
-                    whatwetyping = Typing(whatwetyping)
-                    
+                    whatwetyping = Typing(whatwetyping)      
                      
             y += 1
             if y > 100:
                 y = 0
                 print(whatwetyping)
-            
             
             askfont = pygame.font.Font(None, 36)
             askrect = pygame.Rect(40, 170, 300, 80)
@@ -137,10 +150,18 @@ class TitleScreen():
             pygame.draw.rect(screen, (80, 120, 130), askrect)
             screen.blit(asksurface, asktextrect)
             
+            confirmfont = pygame.font.Font(None, 36)
+            confirmrect = pygame.Rect(40, 570, 300, 80)
+            confirmsurface = confirmfont.render('Enter', True, (255, 255, 255))
+            confirmtextrect = confirmsurface.get_rect(center=confirmrect.center)
+            if confirmrect.collidepoint(pygame.mouse.get_pos()):
+                pygame.draw.rect(screen, (140, 180, 190), confirmrect)
+            else:
+                pygame.draw.rect(screen, (80, 120, 130), confirmrect)
+            screen.blit(confirmsurface, confirmtextrect)
             
             pygame.display.update()
             
-# it would return true/false (if true use something in the json if false search it up on yt) and then the song name 
             
     def SongConfirm(song):
         newnewrunning = True
