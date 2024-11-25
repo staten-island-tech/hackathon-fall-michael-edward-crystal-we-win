@@ -73,11 +73,18 @@ class TitleScreen():
                     pygame.quit()
                     
             screen.fill((0, 0, 0))
+            songsfont = pygame.font.Font(None, 50)
+            songsrect = pygame.Rect(10, 60, 400, 50)
+            songssurface = songsfont.render(f'Available Songs', True, (255, 255, 255))
+            songstextrect = songssurface.get_rect(center=songsrect.center)
+            pygame.draw.rect(screen, (60, 140, 150), songsrect)
+            screen.blit(songssurface, songstextrect)
             
-            ycoordinate = 20
+            ycoordinate = 150
             songs = [
                 {'name': 'hello'}, {'name': 'hey'}
             ]
+            
             for song in songs:
                 songfont = pygame.font.Font(None, 30)
                 songrect = pygame.Rect(10, ycoordinate, 200, 50)
@@ -92,6 +99,21 @@ class TitleScreen():
                 songnamerect = songnamesurface.get_rect(center=songrect.center)
                 screen.blit(songnamesurface, songnamerect)
                 ycoordinate += 100
+            
+            pygame.draw.circle(screen, (15, 15, 25), (750, 360), 300, 280)
+            pygame.draw.circle(screen, (245, 245, 255), (750, 360), 320, 20)
+            pygame.draw.circle(screen, (245, 245, 255), (750, 360), 40, 20)
+            
+            returnfont = pygame.font.Font(None, 50)
+            returnrect = pygame.Rect(10, ycoordinate, 400, 50)
+            returnsurface = returnfont.render(f'Return To Menu', True, (255, 255, 255))
+            returntextrect = returnsurface.get_rect(center=returnrect.center)
+            pygame.draw.rect(screen, (60, 140, 150), returnrect)
+            screen.blit(returnsurface, returntextrect)
+            if returnrect.collidepoint(mouseposition):
+                screen.fill((0, 0, 0))
+                newrunning = False
+                TitleScreen.OpenTitleScreen()
                 
             pygame.display.update()
             
@@ -105,27 +127,44 @@ class TitleScreen():
                     pygame.quit()
                 
             screen.fill((0, 0, 0))
-            yesfont = pygame.font.Font(None, 100)
-            yesrect = pygame.Rect(10, 100, 1000, 500)
-            yessurface = yesfont.render('YES', True, (255, 255, 255))
-            yesrect = yessurface.get_rect(center=yesrect.center)
-            if yesrect.collidepoint(mouseposition):
-                pass
-                #game start function
-            else:
-                pygame.draw.rect(screen, (60, 100, 110), yesrect)
-            screen.blit(yessurface, yesrect)
+
+            askfont = pygame.font.Font(None, 50)
+            askrect = pygame.Rect(830, 20, 400, 100)
+            asksurface = askfont.render(f'Start the song {song['name']}?', True, (255, 255, 255))
+            asktextrect = asksurface.get_rect(center=askrect.center)
+            pygame.draw.rect(screen, (60, 140, 150), askrect)
+            screen.blit(asksurface, asktextrect)
+
+            pygame.draw.circle(screen, (15, 15, 25), (350, 360), 300, 280)
+            pygame.draw.circle(screen, (245, 245, 255), (350, 360), 320, 20)
+            pygame.draw.circle(screen, (245, 245, 255), (350, 360), 40, 20)
             
-            nofont = pygame.font.Font(None, 100)
-            norect = pygame.Rect(100, 200, 1000, 500)
-            nosurface = nofont.render('NO', True, (255, 255, 255))
-            norect = nosurface.get_rect(center=norect.center)
-            if norect.collidepoint(mouseposition):
-                pass
-                #game start function
+            
+            
+            yesfont = pygame.font.Font(None, 30)
+            yesrect = pygame.Rect(830, 130, 400, 100)  
+            yessurface = yesfont.render('YES', True, (255, 255, 255))
+            yestextrect = yessurface.get_rect(center=yesrect.center)  
+            if yesrect.collidepoint(mouseposition):
+                screen.fill((0, 0, 0))
+                print(f'starting the song {song['name']}')
+                newnewrunning = False
+                # start game function
             else:
                 pygame.draw.rect(screen, (60, 100, 110), yesrect)
-            screen.blit(yessurface, yesrect)
+            screen.blit(yessurface, yestextrect)
+
+            nofont = pygame.font.Font(None, 30)
+            norect = pygame.Rect(830, 300, 400, 100)  
+            nosurface = nofont.render('NO', True, (255, 255, 255))
+            notextrect = nosurface.get_rect(center=norect.center)  
+            if norect.collidepoint(mouseposition):
+                screen.fill((0, 0, 0))
+                TitleScreen.OpenMenuScreen()
+                newnewrunning = False
+            else:
+                pygame.draw.rect(screen, (60, 100, 110), norect)
+            screen.blit(nosurface, notextrect)
                 
             pygame.display.update()
 
