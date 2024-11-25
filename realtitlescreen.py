@@ -62,11 +62,32 @@ class TitleScreen():
     def PickaDamnSong():
         newrunning = True
         x = 0
-        def Typing():
+        y = 0
+        whatwetyping = ""
+        def Typing(whatwetyping):
+            whatwetyping = str(whatwetyping)
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_0]:
-                print('hi')
+            for digit in range(10):
+                if keys[pygame.K_0 + digit]:
+                    whatwetyping += f"{0 + digit}"
+                    return whatwetyping
+            for letter in range(26):
+                if keys[pygame.K_a + letter]:
+                    whatwetyping += f"{chr(ord('A') + letter)}"
+                    return whatwetyping
+            if keys[pygame.K_SPACE]:
+                whatwetyping += " "
+                return whatwetyping
+            if keys[pygame.K_BACKSPACE]:
+                whatwetypinglist = list(whatwetyping)
+                whatwetypinglist.remove(whatwetypinglist[len(whatwetypinglist) - 1])
+                whatwetyping = ""
+                for character in whatwetypinglist:
+                    whatwetyping += character
+                return whatwetyping
+             
             
+        
         theyaretyping = False
         color = (50, 90, 100)
         
@@ -82,6 +103,7 @@ class TitleScreen():
                         color = (80, 120, 130)
                     else:
                         color = (50, 90, 100)
+                        theyaretyping = False
                     
             screen.fill((0, 0, 0))
             
@@ -95,6 +117,18 @@ class TitleScreen():
             textboxrect = pygame.Rect(40, 270, 700, 150)
             pygame.draw.rect(screen, color, textboxrect)
             
+            if theyaretyping == True:
+                x += 1 
+                if x > 3:
+                    x = 0
+                    whatwetyping = str(Typing(whatwetyping))
+                    
+                     
+            y += 1
+            if y > 100:
+                y = 0
+                print(whatwetyping)
+            
             
             askfont = pygame.font.Font(None, 36)
             askrect = pygame.Rect(40, 170, 300, 80)
@@ -102,7 +136,8 @@ class TitleScreen():
             asktextrect = asksurface.get_rect(center=askrect.center)
             pygame.draw.rect(screen, (80, 120, 130), askrect)
             screen.blit(asksurface, asktextrect)
-
+            
+            
             pygame.display.update()
             
 # it would return true/false (if true use something in the json if false search it up on yt) and then the song name 
