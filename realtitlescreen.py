@@ -48,9 +48,9 @@ class TitleScreen():
             
             pygame.draw.rect(screen, (10, 40, 50), (290, 100, 700, 100))
             pygame.draw.rect(screen, (0, 30, 40), (290, 100, 700, 100), 5)
-            pygame.draw.circle(screen, (200, 250, 250), (640, 720), 300, 200)
-            pygame.draw.circle(screen, (50, 200, 250), (640, 720), 300, 10)
-            pygame.draw.circle(screen, (50, 200, 250), (640, 720), 100, 10)
+            pygame.draw.circle(screen, (15, 15, 25), (640, 720), 300, 200)
+            pygame.draw.circle(screen, (245, 245, 255), (640, 720), 300, 10)
+            pygame.draw.circle(screen, (245, 245, 255), (640, 720), 100, 10)
             
             textbox = pygame.Rect(200, 150, 400, 100)
             
