@@ -67,13 +67,22 @@ class TitleScreen():
             if keys[pygame.K_0]:
                 print('hi')
             
-            
+        theyaretyping = False
+        color = (50, 90, 100)
+        
         while newrunning == True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     newrunning = False
                     pygame.quit()
                     break
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if textboxrect.collidepoint(pygame.mouse.get_pos()):
+                        theyaretyping = True
+                        color = (80, 120, 130)
+                    else:
+                        color = (50, 90, 100)
+                    
             screen.fill((0, 0, 0))
             
             titlefont = pygame.font.Font(None, 36)
@@ -83,9 +92,9 @@ class TitleScreen():
             pygame.draw.rect(screen, (80, 120, 130), titlerect)
             screen.blit(titlesurface, titletextrect)
             
-            textboxrect = pygame.Rect(40, 270, 600, 200)
-            pygame.draw.rect(screen, (30, 50, 70), textboxrect)
-                    
+            textboxrect = pygame.Rect(40, 270, 700, 150)
+            pygame.draw.rect(screen, color, textboxrect)
+            
             
             askfont = pygame.font.Font(None, 36)
             askrect = pygame.Rect(40, 170, 300, 80)
@@ -93,11 +102,6 @@ class TitleScreen():
             asktextrect = asksurface.get_rect(center=askrect.center)
             pygame.draw.rect(screen, (80, 120, 130), askrect)
             screen.blit(asksurface, asktextrect)
-            
-            x += 1
-            if x > 8:
-                Typing()
-                x = 0
 
             pygame.display.update()
             
