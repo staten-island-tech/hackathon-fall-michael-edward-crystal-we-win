@@ -121,7 +121,7 @@ class TitleScreen():
                 x += 1 
                 if x > 3:
                     x = 0
-                    whatwetyping = str(Typing(whatwetyping))
+                    whatwetyping = Typing(whatwetyping)
                     
                      
             y += 1
