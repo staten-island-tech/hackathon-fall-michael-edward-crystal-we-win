@@ -163,6 +163,5 @@ In this section, reflect on what you learned from this coding session. Did you g
 ```
 1. I need to start using classes more. I usualy default to functions.
 2. My normal code is usually pretty unreadable--I need to write more comments and format my code better (more classes and functions).
-
  ```
 ---
