@@ -1,12 +1,10 @@
 import pygame
 import json
-import os
+
 pygame.init()
 
 screen = pygame.display.set_mode((1280, 720))
-pygame.display.set_caption('Game')
-
-print(os.path.abspath('songs.json'))
+pygame.display.set_caption('Super awesome RHYTHM GAME (epic)')
 
 class TitleScreen():
     def CreateStartGameButton():
@@ -24,15 +22,13 @@ class TitleScreen():
         if buttonrect.collidepoint(mouseposition):
             print('JUMPSCARE!')
             running = False
-            TitleScreen.OpenMenuScreen()
+            TitleScreen.PickaDamnSong()
             pygame.draw.rect(screen, hovercolor, buttonrect)
             pygame.draw.rect(screen, (30, 70, 80), buttonrect, 5)
 
         else:
             pygame.draw.rect(screen, basecolor, buttonrect)
             pygame.draw.rect(screen, (30, 70, 80), buttonrect, 5)
-        
-
         
         screen.blit(buttontextsurface, buttontextrect)   
     
@@ -63,59 +59,128 @@ class TitleScreen():
             TitleScreen.CreateStartGameButton()
             
             pygame.display.update()
+            
+    def Enter(songinput):
+        try:
+            with open('songs.json', 'r') as jsonfile:
+                songs = json.load(jsonfile)
+        except json.JSONDecodeError:
+            songs = []
+        found = False  
+        for song in songs:
+            if song.name == songinput:
+                found = True
+        
+        print(found)
+        return found 
+            # MAKE THIS SEARCH YOUTUBE AND HAVE THE FUNCTION
     
-    def OpenMenuScreen():
+    def PickaDamnSong():
+        whatwetyping = ''
         newrunning = True
+        x = 0
+        y = 0
+        def Typing(whatwetyping):
+            keys = pygame.key.get_pressed()
+    
+            for digit in range(10):
+                if keys[pygame.K_0 + digit]:
+                    whatwetyping += f"{0 + digit}"
+                    return whatwetyping
+    
+
+            for letter in range(26):
+                if keys[pygame.K_a + letter]:
+                    if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]: 
+                        whatwetyping += f"{chr(ord('A') + letter)}"
+                    else:
+                        whatwetyping += f"{chr(ord('a') + letter)}"
+                    return whatwetyping
+
+            if keys[pygame.K_SPACE]:
+                whatwetyping += " "
+                return whatwetyping
+
+            if keys[pygame.K_BACKSPACE] and len(whatwetyping) > 0:
+                whatwetyping = whatwetyping[:-1]
+                return whatwetyping
+
+            if keys[pygame.K_PERIOD]:
+                whatwetyping = whatwetyping + "."
+            
+            if keys[pygame.K_SLASH]:
+                if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:   
+                    whatwetyping = whatwetyping + "?"
+                else:
+                    whatwetyping = whatwetyping + "/"
+                
+            return whatwetyping
+             
+            
+        
+        theyaretyping = False
+        color = (50, 90, 100)
+        
         while newrunning == True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     newrunning = False
                     pygame.quit()
+                    break
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if textboxrect.collidepoint(pygame.mouse.get_pos()):
+                        theyaretyping = True
+                        color = (80, 120, 130)
+                        whatwetyping = ""
+                    elif confirmrect.collidepoint(pygame.mouse.get_pos()):
+                        TitleScreen.Enter(whatwetyping)
+                    else:
+                        color = (50, 90, 100)
+                        theyaretyping = False
+                        
                     
             screen.fill((0, 0, 0))
-            songsfont = pygame.font.Font(None, 50)
-            songsrect = pygame.Rect(10, 60, 400, 50)
-            songssurface = songsfont.render(f'Available Songs', True, (255, 255, 255))
-            songstextrect = songssurface.get_rect(center=songsrect.center)
-            pygame.draw.rect(screen, (60, 140, 150), songsrect)
-            screen.blit(songssurface, songstextrect)
             
-            ycoordinate = 150
-            songs = [
-                {'name': 'hello'}, {'name': 'hey'}
-            ]
+            titlefont = pygame.font.Font(None, 36)
+            titlerect = pygame.Rect(40, 70, 300, 80)
+            titlesurface = titlefont.render('Available Songs', True, (255, 255, 255))
+            titletextrect = titlesurface.get_rect(center=titlerect.center)
+            pygame.draw.rect(screen, (80, 120, 130), titlerect)
+            screen.blit(titlesurface, titletextrect)
             
-            for song in songs:
-                songfont = pygame.font.Font(None, 30)
-                songrect = pygame.Rect(10, ycoordinate, 200, 50)
-                mouseposition = pygame.mouse.get_pos()
-                if songrect.collidepoint(mouseposition):
-                    newrunning = False
-                    TitleScreen.SongConfirm(song)
-                    break
-                else:
-                    pygame.draw.rect(screen, (60, 100, 110), songrect)
-                songnamesurface = songfont.render(song['name'], True, (255, 255, 255))
-                songnamerect = songnamesurface.get_rect(center=songrect.center)
-                screen.blit(songnamesurface, songnamerect)
-                ycoordinate += 100
+            textboxfont = pygame.font.Font(None, 36)
+            textboxrect = pygame.Rect(40, 270, 1000, 150)
+            textboxsurface = textboxfont.render(whatwetyping, True, (255, 255, 255))
+            textboxtextrect = textboxsurface.get_rect(center= textboxrect.center)
+            pygame.draw.rect(screen, color, textboxrect)
+            screen.blit(textboxsurface, textboxtextrect)
             
-            pygame.draw.circle(screen, (15, 15, 25), (750, 360), 300, 280)
-            pygame.draw.circle(screen, (245, 245, 255), (750, 360), 320, 20)
-            pygame.draw.circle(screen, (245, 245, 255), (750, 360), 40, 20)
+            if theyaretyping == True:
+                x += 1 
+                if x > 3:
+                    x = 0
+                    whatwetyping = Typing(whatwetyping) 
+
             
-            returnfont = pygame.font.Font(None, 50)
-            returnrect = pygame.Rect(10, ycoordinate, 400, 50)
-            returnsurface = returnfont.render(f'Return To Menu', True, (255, 255, 255))
-            returntextrect = returnsurface.get_rect(center=returnrect.center)
-            pygame.draw.rect(screen, (60, 140, 150), returnrect)
-            screen.blit(returnsurface, returntextrect)
-            if returnrect.collidepoint(mouseposition):
-                screen.fill((0, 0, 0))
-                newrunning = False
-                TitleScreen.OpenTitleScreen()
-                
+            askfont = pygame.font.Font(None, 36)
+            askrect = pygame.Rect(40, 170, 300, 80)
+            asksurface = askfont.render('Search for a Song:', True, (255, 255, 255))
+            asktextrect = asksurface.get_rect(center=askrect.center)
+            pygame.draw.rect(screen, (80, 120, 130), askrect)
+            screen.blit(asksurface, asktextrect)
+            
+            confirmfont = pygame.font.Font(None, 36)
+            confirmrect = pygame.Rect(40, 570, 300, 80)
+            confirmsurface = confirmfont.render('Enter', True, (255, 255, 255))
+            confirmtextrect = confirmsurface.get_rect(center=confirmrect.center)
+            if confirmrect.collidepoint(pygame.mouse.get_pos()):
+                pygame.draw.rect(screen, (140, 180, 190), confirmrect)
+            else:
+                pygame.draw.rect(screen, (80, 120, 130), confirmrect)
+            screen.blit(confirmsurface, confirmtextrect)
+            
             pygame.display.update()
+            
             
     def SongConfirm(song):
         newnewrunning = True
@@ -140,16 +205,15 @@ class TitleScreen():
             pygame.draw.circle(screen, (245, 245, 255), (350, 360), 40, 20)
             
             
-            
             yesfont = pygame.font.Font(None, 30)
             yesrect = pygame.Rect(830, 130, 400, 100)  
             yessurface = yesfont.render('YES', True, (255, 255, 255))
             yestextrect = yessurface.get_rect(center=yesrect.center)  
             if yesrect.collidepoint(mouseposition):
-                screen.fill((0, 0, 0))
+                screen.fill((0, 0, 0)) 
                 print(f'starting the song {song['name']}')
                 newnewrunning = False
-                # start game function
+                # start game function 
             else:
                 pygame.draw.rect(screen, (60, 100, 110), yesrect)
             screen.blit(yessurface, yestextrect)
@@ -160,7 +224,7 @@ class TitleScreen():
             notextrect = nosurface.get_rect(center=norect.center)  
             if norect.collidepoint(mouseposition):
                 screen.fill((0, 0, 0))
-                TitleScreen.OpenMenuScreen()
+                TitleScreen.PickaDamnSong()
                 newnewrunning = False
             else:
                 pygame.draw.rect(screen, (60, 100, 110), norect)
