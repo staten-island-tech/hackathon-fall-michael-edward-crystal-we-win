@@ -1,5 +1,6 @@
 import pygame
 import json
+import time
 
 with open('userdata.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
@@ -10,6 +11,7 @@ screen = pygame.display.set_mode((1280, 720))
 screen.fill('black')
 
 running = True
+lastChange = 0
 
 font = pygame.font.SysFont('Arial', 40)
 
@@ -70,17 +72,21 @@ class Login_SignUp:
         Text(font, 'Password', 'white', 540, 300).draw()
         pygame.draw.rect(screen, 'white', password_box)
 
-        if self.signup_or_login == 'Log in':
+        global lastChange
+
+        if self.signup_or_login == 'Log in' :
             go_to_signup = Button(490, 570, 300, 50, 'white', 'Go to Sign Up', 'black')
-            go_to_signup.draw(screen)
-            if go_to_signup.is_clicked(mouse_pos, mouse_pressed):
+            go_to_signup.draw(screen) 
+            if go_to_signup.is_clicked(mouse_pos, mouse_pressed) and time.time() - lastChange >= 1:
                 page = 'Sign up'
+                lastChange = time.time()
                 
-        elif self.signup_or_login == 'Sign up':
+        elif self.signup_or_login == 'Sign up' :
             go_to_login = Button(490, 570, 300, 50, 'white', 'Go to Log In', 'black')
             go_to_login.draw(screen)
-            if go_to_login.is_clicked(mouse_pos, mouse_pressed):
+            if go_to_login.is_clicked(mouse_pos, mouse_pressed) and time.time() - lastChange >= 1:
                 page = 'Log in'
+                lastChange = time.time()
                   
     def handle_events(self, event):
         global input_username, input_password, writing_username, writing_password
@@ -163,15 +169,14 @@ while running:
                 for user in data:
                     if user['Username'] == input_username:
                        user_found = True
-                    elif not user_found:
-                        Text(font, 'Username not found', 'white', 500, 225)
                     
-                if user['Password'] == input_password and user_found:
+                    if user['Password'] == input_password and user_found:
                     # edwards page
-                    print('ue')
-                    break
-                elif input_username.strip() == '' or input_password.strip() == '':
-                    Text(font, 'Blank Input', 'white', 535, 225).draw()
+                        pass
+                    elif input_username.strip() == '' or input_password.strip() == ''and user_found:
+                        Text(font, 'Blank Input', 'white', 535, 225).draw()
+                    elif not user_found:
+                        Text(font, 'Username not found', 'white', 500, 225).draw()
                     
     elif page == 'Sign up':
         user_taken = False
