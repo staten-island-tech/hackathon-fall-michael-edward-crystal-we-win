@@ -71,31 +71,50 @@ class TitleScreen():
             if song.name == songinput:
                 found = True
         
+        print(found)
         return found 
             # MAKE THIS SEARCH YOUTUBE AND HAVE THE FUNCTION
     
     def PickaDamnSong():
+        whatwetyping = ''
         newrunning = True
         x = 0
         y = 0
-        whatwetyping = ""
         def Typing(whatwetyping):
-            whatwetyping = str(whatwetyping)
             keys = pygame.key.get_pressed()
+    
             for digit in range(10):
                 if keys[pygame.K_0 + digit]:
                     whatwetyping += f"{0 + digit}"
                     return whatwetyping
+    
+
             for letter in range(26):
                 if keys[pygame.K_a + letter]:
-                    whatwetyping += f"{chr(ord('A') + letter)}"
+                    if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]: 
+                        whatwetyping += f"{chr(ord('A') + letter)}"
+                    else:
+                        whatwetyping += f"{chr(ord('a') + letter)}"
                     return whatwetyping
+
             if keys[pygame.K_SPACE]:
                 whatwetyping += " "
                 return whatwetyping
-            if keys[pygame.K_BACKSPACE]:
+
+            if keys[pygame.K_BACKSPACE] and len(whatwetyping) > 0:
                 whatwetyping = whatwetyping[:-1]
                 return whatwetyping
+
+            if keys[pygame.K_PERIOD]:
+                whatwetyping = whatwetyping + "."
+            
+            if keys[pygame.K_SLASH]:
+                if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:   
+                    whatwetyping = whatwetyping + "?"
+                else:
+                    whatwetyping = whatwetyping + "/"
+                
+            return whatwetyping
              
             
         
@@ -129,19 +148,19 @@ class TitleScreen():
             pygame.draw.rect(screen, (80, 120, 130), titlerect)
             screen.blit(titlesurface, titletextrect)
             
-            textboxrect = pygame.Rect(40, 270, 700, 150)
+            textboxfont = pygame.font.Font(None, 36)
+            textboxrect = pygame.Rect(40, 270, 1000, 150)
+            textboxsurface = textboxfont.render(whatwetyping, True, (255, 255, 255))
+            textboxtextrect = textboxsurface.get_rect(center= textboxrect.center)
             pygame.draw.rect(screen, color, textboxrect)
+            screen.blit(textboxsurface, textboxtextrect)
             
             if theyaretyping == True:
                 x += 1 
                 if x > 3:
                     x = 0
-                    whatwetyping = Typing(whatwetyping)      
-                     
-            y += 1
-            if y > 100:
-                y = 0
-                print(whatwetyping)
+                    whatwetyping = Typing(whatwetyping) 
+
             
             askfont = pygame.font.Font(None, 36)
             askrect = pygame.Rect(40, 170, 300, 80)
