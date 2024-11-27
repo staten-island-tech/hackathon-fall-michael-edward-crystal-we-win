@@ -38,7 +38,7 @@ def load_map(map: mapping.MAP) -> None:
     notespassed = 0
 
     notes = []
-    scores = {"1.0": 'PERFECT', "0.9": 'GOOD', "0.75": "OK", "0.5": 'BAD', "-2": "MISS"} 
+    scores = {"1.0": 'PERFECT', "0.9": 'GOOD', "0.75": "OK", "0.5": 'BAD', "0": "MISS"} 
     font = pygame.font.SysFont("Arial", 24)  
     
     while in_map:
@@ -100,13 +100,13 @@ def load_map(map: mapping.MAP) -> None:
         if key_pressed:
             score, keyTime = asyncio.run(mapping.check_input(timePlaying, key_pressed, beatMap))
             netscore += score  if score != -2 else 0
-            if score and score != -1 and note not in toUpdateAsHit:
-                streak_multiplier = 2 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 0.5) 
+            if score and score != 0 and note not in toUpdateAsHit:
+                streak_multiplier = 2 * (math.ceil(math.log(streak + 1, 2)) if streak > 0 else 0.5) 
                 toUpdateAsHit.append(keyTime)
                 player_score += 50 * score * min(streak_multiplier, 8) 
                 player_score *= accuracy/100 
                 streak += 1
-            elif score == -1 and note not in toUpdateAsHit:
+            elif score == 0 and note not in toUpdateAsHit:
                 streak = 0
                 streak_multiplier = 1
                 player_score = 0.8*player_score
@@ -114,8 +114,8 @@ def load_map(map: mapping.MAP) -> None:
 
             key_pressed = None  
             hit_text = scores[str(score)]
-        
-        player_score = min(player_score,0)
+            print(f"{player_score} (+{ 50 * score * min(streak_multiplier, 8) }); NET: {netscore}")
+        player_score = max(player_score,0)
         accuracy = round(100*netscore/notespassed,2) if notespassed != 0 else 0
         score_text = font.render(f"Score: {player_score:.2f}", True, (255, 255, 255))
         streak_text = font.render(f"Streak: {streak} (Multiplier: {min(streak_multiplier,8)})",True, (255,255,255))

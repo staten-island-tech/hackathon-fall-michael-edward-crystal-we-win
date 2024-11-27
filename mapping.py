@@ -92,7 +92,7 @@ async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> fl
     elif closest_diff <= BAD:
         return 0.5, beat_times[idx]
     else:
-        return -2, beat_times[idx]
+        return 0, beat_times[idx]
 
     
 
