@@ -9,7 +9,7 @@ import inspect
 def get_path() -> str: #i found this monstorsity on stackoverflow
     return os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0])))
 
-def getSong(query, dir=f'{get_path()}//songs') -> str:
+def getSong(query, dir=f'{get_path()}\\songs') -> str:
     os.makedirs(dir, exist_ok=True)
     
     file_safe_query = "".join(c if c.isalnum() or c in " _-" else "_" for c in query)
@@ -36,6 +36,5 @@ def getSong(query, dir=f'{get_path()}//songs') -> str:
 
     return mp3_path
 
-print(getSong('The only thing I know for real'))
 
 

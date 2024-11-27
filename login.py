@@ -1,8 +1,10 @@
 import pygame
 import json
 import time
-
-with open('userdata.json', 'r', encoding='utf-8') as file:
+import os
+import inspect
+print(f'{os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0])))}\\userdata.json')
+with open(f'{os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0])))}\\userdata.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
  
 pygame.init()
@@ -134,76 +136,83 @@ input_password = ''
 writing_username = False
 writing_password = False
 
+def loginFlow():
+    running = True
+    global page
+    global mouse_pos
+    global mouse_pressed
+    global user
 
-while running:
-    mouse_pos = pygame.mouse.get_pos()
-    mouse_pressed = pygame.mouse.get_pressed()
+    while running:
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-        if page == 'Log in' or page == 'Sign up':
-            Login_SignUp(page).handle_events(event)
+            if page == 'Log in' or page == 'Sign up':
+                Login_SignUp(page).handle_events(event)
 
-    if page == 'Beginning':
-        Text(font, 'Our Super Awesome Game!', 'white', 400, 40).draw()
-        log_in.draw(screen)
-        sign_up.draw(screen)
-        if log_in.is_clicked(mouse_pos, mouse_pressed):
-            page = 'Log in'
-        elif sign_up.is_clicked(mouse_pos, mouse_pressed):
-            page = 'Sign up'
-    
-    elif page == 'Log in':
-        login_screen = Login_SignUp('Log in')
-        login_screen.show()
 
-        Text(pygame.font.SysFont('Arial', 20), input_username, 'black', 500, 120).draw()
-        Text(pygame.font.SysFont('Arial', 20), input_password, 'black', 500, 375).draw()
+        if page == 'Beginning':
+            Text(font, 'Our Super Awesome Game!', 'white', 400, 40).draw()
+            log_in.draw(screen)
+            sign_up.draw(screen)
+            if log_in.is_clicked(mouse_pos, mouse_pressed):
+                page = 'Log in'
+            elif sign_up.is_clicked(mouse_pos, mouse_pressed):
+                page = 'Sign up'
         
-        confirm.draw(screen)
+        elif page == 'Log in':
+            login_screen = Login_SignUp('Log in')
+            login_screen.show()
 
-        if confirm.is_clicked(mouse_pos, mouse_pressed):
-                user_found = False 
+            Text(pygame.font.SysFont('Arial', 20), input_username, 'black', 500, 120).draw()
+            Text(pygame.font.SysFont('Arial', 20), input_password, 'black', 500, 375).draw()
+            
+            confirm.draw(screen)
+
+            if confirm.is_clicked(mouse_pos, mouse_pressed):
+                    user_found = False 
+                    for user in data:
+                        if user['Username'] == input_username:
+                            user_found = True
+                        
+                        if user['Password'] == input_password and user_found:
+                             #pygame.quit()
+                             return user
+                        elif input_username.strip() == '' or input_password.strip() == ''and user_found:
+                            Text(font, 'Blank Input', 'white', 535, 225).draw()
+                        elif not user_found:
+                            Text(font, 'Username not found', 'white', 500, 225).draw()
+                        
+        elif page == 'Sign up':
+            user_taken = False
+            signup_screen = Login_SignUp('Sign up')
+            signup_screen.show()
+
+            Text(pygame.font.SysFont('Arial', 20), input_username, 'black', 500, 120).draw()
+            Text(pygame.font.SysFont('Arial', 20), input_password, 'black', 500, 375).draw()
+            
+            confirm.draw(screen)
+
+            if confirm.is_clicked(mouse_pos, mouse_pressed):
                 for user in data:
                     if user['Username'] == input_username:
-                       user_found = True
-                    
-                    if user['Password'] == input_password and user_found:
-                    # edwards page
-                        pass
-                    elif input_username.strip() == '' or input_password.strip() == ''and user_found:
-                        Text(font, 'Blank Input', 'white', 535, 225).draw()
-                    elif not user_found:
-                        Text(font, 'Username not found', 'white', 500, 225).draw()
-                    
-    elif page == 'Sign up':
-        user_taken = False
-        signup_screen = Login_SignUp('Sign up')
-        signup_screen.show()
+                        user_taken = True
+                        Text(font, 'Username taken', 'white', 500, 225).draw()
 
-        Text(pygame.font.SysFont('Arial', 20), input_username, 'black', 500, 120).draw()
-        Text(pygame.font.SysFont('Arial', 20), input_password, 'black', 500, 375).draw()
-        
-        confirm.draw(screen)
+                if not user_taken and input_username != '' and input_password != '':
+                    new_data = {"Username": input_username, "Password": input_password}
+                    data.append(new_data)
+                    with open(f'{os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0])))}\\userdata.json', 'w') as file:
+                        json.dump(data, file, indent=4)
+                    #pygame.quit()
+                    return new_data
+                elif input_username.strip() == '' or input_password.strip() == '':
+                    Text(font, 'Blank Input', 'white', 535, 225).draw()
+                
+        pygame.display.flip()
 
-        if confirm.is_clicked(mouse_pos, mouse_pressed):
-            for user in data:
-                if user['Username'] == input_username:
-                    user_taken = True
-                    Text(font, 'Username taken', 'white', 500, 225).draw()
 
-            if not user_taken and input_username != '' and input_password != '':
-                new_data = {"Username": input_username, "Password": input_password}
-                data.append(new_data)
-                with open('userdata.json', 'w') as file:
-                  json.dump(data, file, indent=4)
-                break
-                #go to edwards page
-            elif input_username.strip() == '' or input_password.strip() == '':
-                Text(font, 'Blank Input', 'white', 535, 225).draw()
-            
-    pygame.display.flip()
-
-pygame.quit()

@@ -4,7 +4,7 @@ import random
 import time
 import asyncio
 import math
-
+asyncio.sleep(2)
 
 qwerty = 'qwertyuiopasdfghjklzxcvbnm'.upper()
 
@@ -12,14 +12,14 @@ key_positions = {}
 for i in range(len(qwerty)):
       key_positions[qwerty[i]] = 700*i/len(qwerty)  
 
-print(key_positions)
+
 def play_music(mp3path: str) -> None:
     pygame.mixer.music.load(mp3path)
     pygame.mixer.music.play(loops=0, start=0.0)
 
 def load_map(map: mapping.MAP) -> None:
     pygame.init()
-    screen = pygame.display.set_mode((1280, 720))
+    screen = pygame.display.set_mode((1310, 720))
     clock = pygame.time.Clock()
 
     map_info, beatMap = map.map()
@@ -32,13 +32,13 @@ def load_map(map: mapping.MAP) -> None:
     in_map = True
     key_pressed = None
     streak = 0
-    streak_multiplier = 50 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 1) #50floor(log2(streak + 2))
+    streak_multiplier = math.floor(math.log(streak + 1, 2)) if streak > 0 else 1 #floor(log2(streak + 2))
     accuracy = 1
     netscore = 0
     notespassed = 0
 
     notes = []
-    scores = {"1.0": 'PERFECT', "0.8": 'GOOD', "0.5": "OK", "0.2": 'BAD', "-1": "MISS"} 
+    scores = {"1.0": 'PERFECT', "0.9": 'GOOD', "0.75": "OK", "0.5": 'BAD', "-2": "MISS"} 
     font = pygame.font.SysFont("Arial", 24)  
     
     while in_map:
@@ -74,6 +74,7 @@ def load_map(map: mapping.MAP) -> None:
             if not note['hit'] and timePlaying > note['beat_time'] + 0.2:
                 streak = 0 
                 player_score = max(player_score * 0.9, player_score - 50)
+                hit_text = 'MISS'
                 note['hit'] = True
 
             x_pos = time_since_spawned * 750  
@@ -85,7 +86,7 @@ def load_map(map: mapping.MAP) -> None:
             )
 
             key_label = font.render(note['beat_key'], True, (255, 255, 255))
-            screen.blit(key_label, (1250, note['y_pos']))
+            screen.blit(key_label, (1280, note['y_pos']))
 
     
         for event in pygame.event.get():
@@ -98,7 +99,7 @@ def load_map(map: mapping.MAP) -> None:
      
         if key_pressed:
             score, keyTime = asyncio.run(mapping.check_input(timePlaying, key_pressed, beatMap))
-            netscore += score ** (1/3) if score != -1 else 0
+            netscore += score  if score != -2 else 0
             if score and score != -1 and note not in toUpdateAsHit:
                 streak_multiplier = 2 * (math.floor(math.log(streak + 1, 2)) if streak > 0 else 0.5) 
                 toUpdateAsHit.append(keyTime)
@@ -114,6 +115,7 @@ def load_map(map: mapping.MAP) -> None:
             key_pressed = None  
             hit_text = scores[str(score)]
         
+        player_score = min(player_score,0)
         accuracy = round(100*netscore/notespassed,2) if notespassed != 0 else 0
         score_text = font.render(f"Score: {player_score:.2f}", True, (255, 255, 255))
         streak_text = font.render(f"Streak: {streak} (Multiplier: {min(streak_multiplier,8)})",True, (255,255,255))
@@ -123,6 +125,7 @@ def load_map(map: mapping.MAP) -> None:
         screen.blit(font.render(f"{hit_text} ({accuracy}%)", True, (random.randint(100,255),random.randint(100,255),random.randint(100,255))), (10,50))
         pygame.display.flip()
         clock.tick(60)  
+        if timePlaying >= map_info['Length']+0.5: return [score, accuracy]
 
 
-#load_map(mapping.MAP('Megalovania', r"C:\Users\mmati\OneDrive\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\Toby Fox - Megalovania.mp3"))
+#load_map(mapping.MAP('The only thing I know for real', r"C:\Users\mmati\OneDrive\Documents\GitHub\hackathon-fall-michael-edward-crystal-we-win\songs\The only thing I know for real.mp3"))

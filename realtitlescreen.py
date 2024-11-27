@@ -1,7 +1,8 @@
 import pygame
 import json
-
-pygame.init()
+import getsong
+import asyncio
+import time
 
 screen = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption('Super awesome RHYTHM GAME (epic)')
@@ -61,61 +62,65 @@ class TitleScreen():
             pygame.display.update()
             
     def Enter(songinput):
-        try:
-            with open('songs.json', 'r') as jsonfile:
-                songs = json.load(jsonfile)
-        except json.JSONDecodeError:
-            songs = []
-        found = False  
-        for song in songs:
-            if song.name == songinput:
-                found = True
-        
+        found = getsong.getSong(songinput)
         print(found)
-        return found 
-            # MAKE THIS SEARCH YOUTUBE AND HAVE THE FUNCTION
-    
+        return songinput, found 
+            
+    global timeLastTyped
+    timeLastTyped = 0
     def PickaDamnSong():
+        pygame.init()
         whatwetyping = ''
         newrunning = True
         x = 0
         y = 0
+    
         def Typing(whatwetyping):
+            global timeLastTyped
+
             keys = pygame.key.get_pressed()
-    
-            for digit in range(10):
-                if keys[pygame.K_0 + digit]:
-                    whatwetyping += f"{0 + digit}"
-                    return whatwetyping
-    
+            if time.time() >= timeLastTyped + 0.2:
+                for digit in range(10):
+                    if keys[pygame.K_0 + digit]:
+                        whatwetyping += f"{0 + digit}"
+                        timeLastTyped = time.time()
+                        return whatwetyping
+        
 
-            for letter in range(26):
-                if keys[pygame.K_a + letter]:
-                    if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]: 
-                        whatwetyping += f"{chr(ord('A') + letter)}"
+                for letter in range(26):
+                    if keys[pygame.K_a + letter]:
+                        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]: 
+                            whatwetyping += f"{chr(ord('A') + letter)}"
+                            timeLastTyped = time.time()
+                        else:
+                            whatwetyping += f"{chr(ord('a') + letter)}"
+                            timeLastTyped = time.time()
+                        return whatwetyping
+
+                if keys[pygame.K_SPACE]:
+                    whatwetyping += " "
+                    timeLastTyped = time.time()
+                    return whatwetyping
+
+                if keys[pygame.K_BACKSPACE] and len(whatwetyping) > 0:
+                    whatwetyping = whatwetyping[:-1]
+                    timeLastTyped = time.time()
+                    return whatwetyping
+
+                if keys[pygame.K_PERIOD]:
+                    whatwetyping = whatwetyping + "."
+                    timeLastTyped = time.time()
+
+                if keys[pygame.K_SLASH]:
+                    if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:   
+                        whatwetyping = whatwetyping + "?"
+                        timeLastTyped = time.time()
                     else:
-                        whatwetyping += f"{chr(ord('a') + letter)}"
-                    return whatwetyping
-
-            if keys[pygame.K_SPACE]:
-                whatwetyping += " "
-                return whatwetyping
-
-            if keys[pygame.K_BACKSPACE] and len(whatwetyping) > 0:
-                whatwetyping = whatwetyping[:-1]
-                return whatwetyping
-
-            if keys[pygame.K_PERIOD]:
-                whatwetyping = whatwetyping + "."
-            
-            if keys[pygame.K_SLASH]:
-                if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:   
-                    whatwetyping = whatwetyping + "?"
-                else:
-                    whatwetyping = whatwetyping + "/"
-                
+                        whatwetyping = whatwetyping + "/"
+                        timeLastTyped = time.time()
+                    
             return whatwetyping
-             
+            
             
         
         theyaretyping = False
@@ -133,7 +138,7 @@ class TitleScreen():
                         color = (80, 120, 130)
                         whatwetyping = ""
                     elif confirmrect.collidepoint(pygame.mouse.get_pos()):
-                        TitleScreen.Enter(whatwetyping)
+                        return TitleScreen.Enter(whatwetyping)
                     else:
                         color = (50, 90, 100)
                         theyaretyping = False
@@ -143,7 +148,7 @@ class TitleScreen():
             
             titlefont = pygame.font.Font(None, 36)
             titlerect = pygame.Rect(40, 70, 300, 80)
-            titlesurface = titlefont.render('Available Songs', True, (255, 255, 255))
+            titlesurface = titlefont.render('Just Search', True, (255, 255, 255))
             titletextrect = titlesurface.get_rect(center=titlerect.center)
             pygame.draw.rect(screen, (80, 120, 130), titlerect)
             screen.blit(titlesurface, titletextrect)
@@ -195,7 +200,7 @@ class TitleScreen():
 
             askfont = pygame.font.Font(None, 50)
             askrect = pygame.Rect(830, 20, 400, 100)
-            asksurface = askfont.render(f'Start the song {song['name']}?', True, (255, 255, 255))
+            asksurface = askfont.render(f"Start the song {song['name']}?", True, (255, 255, 255))
             asktextrect = asksurface.get_rect(center=askrect.center)
             pygame.draw.rect(screen, (60, 140, 150), askrect)
             screen.blit(asksurface, asktextrect)
@@ -211,7 +216,7 @@ class TitleScreen():
             yestextrect = yessurface.get_rect(center=yesrect.center)  
             if yesrect.collidepoint(mouseposition):
                 screen.fill((0, 0, 0)) 
-                print(f'starting the song {song['name']}')
+                print(f"starting the song {song['name']}")
                 newnewrunning = False
                 # start game function 
             else:
@@ -232,4 +237,3 @@ class TitleScreen():
                 
             pygame.display.update()
 
-TitleScreen.OpenTitleScreen()
