@@ -71,7 +71,7 @@ def load_map(map: mapping.MAP) -> None:
             if note['beat_time'] in toUpdateAsHit:
                 note['hit'] = True
 
-            if not note['hit'] and timePlaying > note['beat_time'] + 0.2:
+            if not note['hit'] and timePlaying > note['beat_time'] + 1:
                 streak = 0 
                 player_score = max(player_score * 0.9, player_score - 50)
                 hit_text = 'MISS'

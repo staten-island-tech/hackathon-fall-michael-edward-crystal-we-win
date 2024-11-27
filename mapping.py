@@ -64,10 +64,10 @@ class MAP:
         ]
     
 async def check_input(time: float, key: str, map: list[tuple[float, str]]) -> float | None: #runtime 5ms i think thats ok
-    PERFECT = 0.05
-    GOOD = 0.1
-    OK = 0.15
-    BAD = 0.2
+    PERFECT = 0.125
+    GOOD = 0.25
+    OK = 0.5
+    BAD = 1
 
     beat_times = [beat_time for beat_time, beat_key in map if beat_key == key]
 
